@@ -21,6 +21,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -109,7 +111,11 @@ public class UserController {
             System.out.println(one.getPassword());
             return RespBean.error(RespBeanEnum.LOGIN_ERROR);
         }
-
+        Date date = new Date();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String format = simpleDateFormat.format(date);
+        one.setLastLoginDate(format);
+        int update = userMapper.updateById(one);
         one.setPassword("");
         return RespBean.success(one);
     }
@@ -124,6 +130,11 @@ public class UserController {
         user.setUserId(uuid);
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
         userQueryWrapper.eq("email",email);
+
+        Date date = new Date();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String format = simpleDateFormat.format(date);
+        user.setCreateDate(format);
         User one = userMapper.selectOne(userQueryWrapper);
         if (one != null)
             return RespBean.error(RespBeanEnum.EMAIL_ERROR);

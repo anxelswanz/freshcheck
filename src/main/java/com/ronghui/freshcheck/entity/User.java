@@ -27,6 +27,27 @@ public class User implements Serializable {
 
     private String houseName;
 
+    private String lastLoginDate;
+
+    private String createDate;
+
+
+    public String getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(String createDate) {
+        this.createDate = createDate;
+    }
+
+    public String getLastLoginDate() {
+        return lastLoginDate;
+    }
+
+    public void setLastLoginDate(String lastLoginDate) {
+        this.lastLoginDate = lastLoginDate;
+    }
+
     public String getUserId() {
         return userId;
     }
@@ -66,11 +87,12 @@ public class User implements Serializable {
     @Override
     public String toString() {
         return "User{" +
-            "userId=" + userId +
-            ", userName=" + userName +
-            ", password=" + password +
-            ", email=" + email +
-            ", houseName=" + houseName +
-        "}";
+                "userId='" + userId + '\'' +
+                ", userName='" + userName + '\'' +
+                ", password='" + password + '\'' +
+                ", email='" + email + '\'' +
+                ", houseName='" + houseName + '\'' +
+                ", lastLoginDate='" + lastLoginDate + '\'' +
+                '}';
     }
 }

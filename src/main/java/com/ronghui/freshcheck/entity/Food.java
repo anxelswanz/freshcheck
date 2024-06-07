@@ -1,5 +1,8 @@
 package com.ronghui.freshcheck.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+
 import java.io.Serializable;
 
 /**
@@ -16,6 +19,7 @@ public class Food implements Serializable {
 
     private String userId;
 
+    @TableId
     private String foodId;
 
     private String foodName;
@@ -39,6 +43,36 @@ public class Food implements Serializable {
     private String unit;
 
     private Double price;
+
+    private String storageLocation;
+
+    private int ifTick;
+
+    private int ifAddedWaste;
+
+    public int getIfAddedWaste() {
+        return ifAddedWaste;
+    }
+
+    public void setIfAddedWaste(int ifAddedWaste) {
+        this.ifAddedWaste = ifAddedWaste;
+    }
+
+    public int getIfTick() {
+        return ifTick;
+    }
+
+    public void setIfTick(int ifTick) {
+        this.ifTick = ifTick;
+    }
+
+    public String getStorageLocation() {
+        return storageLocation;
+    }
+
+    public void setStorageLocation(String storageLocation) {
+        this.storageLocation = storageLocation;
+    }
 
     public String getUserId() {
         return userId;
@@ -135,19 +169,22 @@ public class Food implements Serializable {
     @Override
     public String toString() {
         return "Food{" +
-            "userId=" + userId +
-            ", foodId=" + foodId +
-            ", foodName=" + foodName +
-            ", brand=" + brand +
-            ", foodCategory=" + foodCategory +
-            ", createDate=" + createDate +
-            ", purchaseDate=" + purchaseDate +
-            ", expireDate=" + expireDate +
-            ", ifExpire=" + ifExpire +
-            ", quantity=" + quantity +
-            ", weight=" + weight +
-            ", unit=" + unit +
-            ", price=" + price +
-        "}";
+                "userId='" + userId + '\'' +
+                ", foodId='" + foodId + '\'' +
+                ", foodName='" + foodName + '\'' +
+                ", brand='" + brand + '\'' +
+                ", foodCategory='" + foodCategory + '\'' +
+                ", createDate='" + createDate + '\'' +
+                ", purchaseDate='" + purchaseDate + '\'' +
+                ", expireDate='" + expireDate + '\'' +
+                ", ifExpire=" + ifExpire +
+                ", quantity=" + quantity +
+                ", weight=" + weight +
+                ", unit='" + unit + '\'' +
+                ", price=" + price +
+                ", storageLocation='" + storageLocation + '\'' +
+                ", ifTick=" + ifTick +
+                ", ifAddedWaste=" + ifAddedWaste +
+                '}';
     }
 }
