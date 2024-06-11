@@ -17,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
@@ -110,5 +111,121 @@ public class FoodWastageController {
 
     }
 
+    @GetMapping("/getThreeMonthsWastagePrice/{userId}")
+    public RespBean getStatistics(@PathVariable String userId){
+        if (!ObjectUtil.isNotEmpty(userId)) {
+            return RespBean.error(RespBeanEnum.ERROR);
+        }
+        /**
+         *  1. Get the total wastage price of recent three months
+         */
+        HashMap<String, Object> returnMap = new HashMap<>();
+        // 获取当前日期
+        LocalDate currentDate = LocalDate.now();
 
+        // 创建一个格式化对象，用于输出月份和年份
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
+
+        // 存储最近三个月的月份和年份
+        List<String> lastThreeMonths = new ArrayList<>();
+
+        // 获取当前月份及过去两个月的月份和年份
+        String previousMonth = "";
+        String currentMonth = "";
+        for (int i = 0; i < 3; i++) {
+            LocalDate date = currentDate.minusMonths(i);
+            String format = date.format(formatter);
+            lastThreeMonths.add(format);
+            if (i == 0) {
+                currentMonth = format;
+            } else if (i == 1) {
+                previousMonth = format;
+            }
+        }
+        Collections.reverse(lastThreeMonths);
+        returnMap.put("numberList", lastThreeMonths);
+
+        double currentSum = 0;
+        double previousSum = 0;
+
+        List<Double> wastePriceList = new ArrayList<>();
+        int size = 0;
+        for (String lastThreeMonth : lastThreeMonths) {
+
+            QueryWrapper<FoodWastage> foodWastageQueryWrapper = new QueryWrapper<>();
+            foodWastageQueryWrapper.like("expire_date",lastThreeMonth);
+            List<FoodWastage> wastages = foodWastageMapper.selectList(foodWastageQueryWrapper);
+            if (wastages != null) {
+                Double totalNum = wastages.stream().map(FoodWastage::getPrice).reduce(0.0, Double::sum);
+                wastePriceList.add(totalNum);
+                if (currentMonth.equals(lastThreeMonth)) {
+                    returnMap.put("currentAmount", totalNum);
+                    size = wastages.size();
+                    currentSum = totalNum;
+                } else if (previousMonth.equals(lastThreeMonth)) {
+                    previousSum = totalNum;
+                }
+                returnMap.put(lastThreeMonth,totalNum);
+            } else {
+                wastePriceList.add(0.0);
+                returnMap.put(lastThreeMonth, 0.0);
+            }
+        }
+
+
+        returnMap.put("wasteSize", size);
+        returnMap.put("priceList", wastePriceList);
+
+        /**
+         *  2. Compare this month and last month price decrease or increase
+         */
+        double saveFood = currentSum - previousSum;
+        returnMap.put("compareMoneyDifference", saveFood);
+
+        /**
+         *  3. Determine the magnitude
+         */
+        double percentage;
+        if (previousSum != 0) {
+            if (previousSum > currentSum) {
+                 returnMap.put("magnitude","decrease");
+                 percentage = (previousSum - currentSum) / previousSum;
+                 returnMap.put("percentage", percentage);
+            } else {
+                returnMap.put("magnitude","increase");
+                percentage = (currentSum - previousSum) / previousSum;
+                returnMap.put("percentage", percentage);
+            }
+        } else {
+            returnMap.put("magnitude", null);
+            returnMap.put("percentage", null);
+        }
+
+        /**
+         *  Inventory amount
+         */
+        QueryWrapper<Food> foodQueryWrapper = new QueryWrapper<>();
+        foodQueryWrapper.like("create_date", currentMonth);
+        foodQueryWrapper.eq("user_id", userId);
+        Integer count = foodMapper.selectCount(foodQueryWrapper);
+        returnMap.put("inventoryCount", count);
+
+        List<Map<String, Object>> topThreeFoodCategories = foodWastageMapper.getTopThreeFoodCategories(currentMonth, userId);
+        List<Map<String, Object>> topThree = new ArrayList<>();
+        List<Object> keys = new ArrayList<>();
+        for (Map<String, Object> topThreeFoodCategory : topThreeFoodCategories) {
+            HashMap<String, Object> key = new HashMap<>();
+            key.put("value", topThreeFoodCategory.get("count"));
+            key.put("name", topThreeFoodCategory.get("food_category"));
+            keys.add(topThreeFoodCategory.get("food_category"));
+            topThree.add(key);
+        }
+        System.out.println(topThreeFoodCategories);
+        returnMap.put("topThree", topThree);
+        returnMap.put("topThreeList", keys);
+        return RespBean.success(returnMap);
+    }
+
+
+   // @GetMapping("/get")
 }

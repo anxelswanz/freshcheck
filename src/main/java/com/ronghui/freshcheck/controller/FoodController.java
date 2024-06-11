@@ -192,6 +192,16 @@ public class FoodController {
         return RespBean.success(newList);
     }
 
+    @GetMapping("/currentInventoryAmount/{userId}")
+    public RespBean currentInventoryAmount(@PathVariable String userId) {
+        if (userId == null)
+            return RespBean.error(RespBeanEnum.ERROR);
+        QueryWrapper<Food> foodQueryWrapper = new QueryWrapper<>();
+        foodQueryWrapper.eq("user_id",userId);
+        foodQueryWrapper.eq("if_expire", 0);
+        Integer count = foodMapper.selectCount(foodQueryWrapper);
+        return RespBean.success(count);
+    }
 
     public boolean ifExpire(String s1, String s2) {
         try {
