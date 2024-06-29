@@ -50,6 +50,16 @@ public class Food implements Serializable {
 
     private int ifAddedWaste;
 
+    private int label;
+
+    public int getLabel() {
+        return label;
+    }
+
+    public void setLabel(int label) {
+        this.label = label;
+    }
+
     public int getIfAddedWaste() {
         return ifAddedWaste;
     }

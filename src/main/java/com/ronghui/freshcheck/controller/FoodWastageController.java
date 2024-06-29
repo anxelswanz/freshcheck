@@ -226,6 +226,4 @@ public class FoodWastageController {
         return RespBean.success(returnMap);
     }
 
-
-   // @GetMapping("/get")
 }

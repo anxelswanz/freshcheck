@@ -23,9 +23,15 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 
+/**
+ * @author Ronghui Zhong
+ * @description:
+ * @date 2024/6/10 2:10
+ * @ProjectName freshcheck
+ **/
+
 @RestController
 @RequestMapping("/food")
-
 public class FoodController {
 
     @Autowired
@@ -203,6 +209,22 @@ public class FoodController {
         return RespBean.success(count);
     }
 
+    @GetMapping("/search/{userId}/{search}")
+    public RespBean search(@PathVariable String userId, @PathVariable String search){
+        QueryWrapper<Food> foodQueryWrapper = new QueryWrapper<>();
+        foodQueryWrapper.eq("user_id", userId);
+        foodQueryWrapper.eq("if_expire", 0);
+        foodQueryWrapper.like("food_name", search)
+                .or()
+                .like("brand", search)
+                .or()
+                .like("food_category", search)
+                .or()
+                .like("storage_location", search);
+        List<Food> foods = foodMapper.selectList(foodQueryWrapper);
+        return RespBean.success(foods);
+    }
+
     public boolean ifExpire(String s1, String s2) {
         try {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -237,4 +259,6 @@ public class FoodController {
         // 输出结果
         return days;
     }
+
+
 }
