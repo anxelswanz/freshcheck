@@ -45,27 +45,42 @@ public class FoodController {
 
     @PostMapping("/addFood")
     public RespBean addFood(@RequestBody Food food){
-        String purchaseDate = food.getPurchaseDate().substring(0, 10);
-        String expireDate = food.getExpireDate().substring(0, 10);
-        food.setPurchaseDate(purchaseDate);
-        food.setExpireDate(expireDate);
-        boolean b = ifExpire(purchaseDate, expireDate);
-        if (b) {
-            food.setIfExpire(1);
-        } else {
-            food.setIfExpire(0);
-        }
-        Date date = new Date();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String format = simpleDateFormat.format(date);
-        food.setCreateDate(format);
-        food.setIfTick(0);
         System.out.println(food);
         if (ObjectUtil.isEmpty(food))
             return RespBean.error(RespBeanEnum.ERROR);
         String uuid = UUID.randomUUID().toString();
         food.setFoodId(uuid);
         food.setUnit(food.getUnit().toLowerCase());
+        Date date = new Date();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String format = simpleDateFormat.format(date);
+        String purchaseDate = food.getPurchaseDate().substring(0, 10);
+        String expireDate = food.getExpireDate().substring(0, 10);
+        food.setPurchaseDate(purchaseDate);
+        food.setExpireDate(expireDate);
+        food.setCreateDate(format);
+        food.setIfTick(0);
+        boolean b = ifExpire(format, expireDate);
+        if (b) {
+            FoodWastage wastage = new FoodWastage();
+            wastage.setFoodCategory(food.getFoodCategory());
+            wastage.setFoodName(food.getFoodName());
+            wastage.setBrand(food.getBrand());
+            wastage.setReason("OUT OF DATE");
+            wastage.setPrice(food.getPrice());
+            wastage.setUnit(food.getUnit());
+            wastage.setFoodId(food.getFoodId());
+            wastage.setWeight(food.getWeight());
+            wastage.setExpireDate(food.getExpireDate());
+            wastage.setQuantity(food.getQuantity());
+            wastage.setUserId(food.getUserId());
+            foodWastageMapper.insert(wastage);
+            food.setIfExpire(1);
+            food.setIfAddedWaste(1);
+        } else {
+            food.setIfExpire(0);
+        }
+
         int insert = foodMapper.insert(food);
 
         // insert to alert

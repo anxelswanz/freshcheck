@@ -28,7 +28,7 @@ public class MD5Utils {
     }
     //编写主类进行测试
     public static void main(String args[]) {
-        String s = "123";
+        String s = "123456";
         System.out.println("原始：" + s);
 
         System.out.println("加密后："+MD5Utils.inputPassToFormPass(s));

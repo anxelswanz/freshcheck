@@ -135,6 +135,9 @@ public class UserController {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String format = simpleDateFormat.format(date);
         user.setCreateDate(format);
+
+        String md5Password = MD5Utils.inputPassToFormPass(user.getPassword());
+        user.setPassword(md5Password);
         User one = userMapper.selectOne(userQueryWrapper);
         if (one != null)
             return RespBean.error(RespBeanEnum.EMAIL_ERROR);
